@@ -4,7 +4,7 @@ class SoundService {
   final AudioPlayer _player = AudioPlayer();
   final AudioPlayer _bgPlayer = AudioPlayer();
 
-  /// Play short effects
+
   Future<void> playEffect(String assetPath) async {
     try {
       await _player.setAsset(assetPath);
@@ -14,7 +14,7 @@ class SoundService {
     }
   }
 
-  /// Start looping background music
+
   Future<void> startBackground(String assetPath) async {
     try {
       await _bgPlayer.setAsset(assetPath);

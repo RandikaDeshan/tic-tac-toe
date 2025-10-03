@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:tic_tac_toe/viewmodels/auth_viewmodel.dart';
 import 'package:tic_tac_toe/viewmodels/game_viewmodel.dart';
 import 'package:tic_tac_toe/views/auth/splash_screen.dart';
+import 'package:tic_tac_toe/wrapper_page.dart';
 
 import 'firebase_options.dart';
 
@@ -18,7 +19,7 @@ void main() async{
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
     return MultiProvider(
@@ -27,7 +28,6 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(
         create: (_) {
           final vm = GameViewModel();
-          // start bg music
           vm.soundService.startBackground('assets/sounds/bg_music.mp3');
           return vm;
         }),],
@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
           debugShowCheckedModeBanner: false,
           title: 'Tic Tac Toe',
           theme: ThemeData(primarySwatch: Colors.blue),
-          home: const SplashScreen(),
+          home: const WrapperPage(),
         ),
     );
   }

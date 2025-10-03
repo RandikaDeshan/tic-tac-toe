@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tic_tac_toe/views/game_view.dart';
+import 'package:tic_tac_toe/views/home_page.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
 import 'login_screen.dart';
@@ -125,7 +127,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: 48,),
                             TextButton(onPressed: () async{
                               if(_formKey.currentState!.validate()){
-
+                                await vm.registerWithEmail(_emailController.text, _passwordController.text);
+                                if (vm.errorMessage == null && vm.currentUser != null) {
+                                  if (!mounted) return;
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage()),
+                                  );
+                                } else {
+                                  if (!mounted) return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text("Registration Failed"),
+                                      content: Text(vm.errorMessage ?? "Unknown error"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
                               }
                             },
                                 style: TextButton.styleFrom(
@@ -146,10 +170,29 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             SizedBox(height: 30,),
                             TextButton(onPressed: () async{
                               try{
-                                // await UserService().googleSaveUser();
-                                // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                                //   return Navbar();
-                                // },));
+                                await vm.signInWithGoogle();
+                                if (vm.errorMessage == null && vm.currentUser != null) {
+                                  if (!mounted) return;
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage()),
+                                  );
+                                } else {
+                                  if (!mounted) return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text("Registration Failed"),
+                                      content: Text(vm.errorMessage ?? "Unknown error"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
                               }catch(error){
                                 print("Error : $error");
                                 if(mounted){

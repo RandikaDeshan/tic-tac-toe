@@ -1,24 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:tic_tac_toe/views/auth/forgot_password_screen.dart';
 import 'package:tic_tac_toe/views/auth/register_screen.dart';
+import 'package:tic_tac_toe/views/home_page.dart';
+import 'package:tic_tac_toe/wrapper_page.dart';
 
 import '../../viewmodels/auth_viewmodel.dart';
 import '../game_view.dart';
 
-class LoginScreen extends StatelessWidget {
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
+  @override
+  State<LoginScreen> createState() => _LoginScreenState();
+}
+
+class _LoginScreenState extends State<LoginScreen> {
+  final emailCtrl = TextEditingController();
+  final passCtrl = TextEditingController();
+  final _formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
     final vm = Provider.of<AuthViewModel>(context);
 
     if (vm.currentUser != null) {
-      return const GameView(); // user logged in
+      return const HomePage();
     }
-
-    final emailCtrl = TextEditingController();
-    final passCtrl = TextEditingController();
-    final _formKey = GlobalKey<FormState>();
     return Scaffold(
       body: vm.isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -97,27 +104,57 @@ class LoginScreen extends StatelessWidget {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 TextButton(onPressed: (){
-                                  // Navigator.push(context, MaterialPageRoute(builder: (context) {
-                                  //   return ForgotPasswordScreen();
-                                  // },));
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) {
+                                    return ForgotPasswordScreen();
+                                  },));
                                 }, child: Text("Forgot Password")),
                               ],
                             ),
                             SizedBox(height: 48,),
-                            TextButton(onPressed: (){
-                              if(_formKey.currentState!.validate()) {
-                                // signIn();
-                              }
-                            },
-                                style: TextButton.styleFrom(
-                                  fixedSize: Size(MediaQuery.of(context).size.width, 52),
-                                  backgroundColor: Color(0XFF4866F0),
+                            TextButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate()) {
+                                  await vm.signInWithEmail(emailCtrl.text.trim(), passCtrl.text.trim());
+
+                                  if (vm.errorMessage == null && vm.currentUser != null) {
+
+                                    if (!mounted) return;
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const HomePage()),
+                                    );
+                                  } else {
+                                    if (!mounted) return;
+                                    showDialog(
+                                      context: context,
+                                      builder: (_) => AlertDialog(
+                                        title: const Text("Login Failed"),
+                                        content: Text(vm.errorMessage ?? "Unknown error"),
+                                        actions: [
+                                          TextButton(
+                                            onPressed: () => Navigator.pop(context),
+                                            child: const Text("OK"),
+                                          )
+                                        ],
+                                      ),
+                                    );
+                                  }
+                                }
+                              },
+                              style: TextButton.styleFrom(
+                                fixedSize: Size(MediaQuery.of(context).size.width, 52),
+                                backgroundColor: const Color(0XFF4866F0),
+                              ),
+                              child: const Text(
+                                "Login",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Colors.white,
+                                  fontSize: 20,
                                 ),
-                                child: Text("Login",style: TextStyle(
-                                    fontWeight: FontWeight.w700,
-                                    color: Colors.white,
-                                    fontSize: 20
-                                ),)),
+                              ),
+                            ),
+
                             SizedBox(height: 30,),
                             Center(child: Text("OR",style: TextStyle(
                                 fontWeight: FontWeight.w700,
@@ -127,10 +164,29 @@ class LoginScreen extends StatelessWidget {
                             SizedBox(height: 30,),
                             TextButton(onPressed: () async{
                               try{
-                                // await UserService().googleSaveUser();
-                                // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) {
-                                //   return Navbar();
-                                // },));
+                                await vm.signInWithGoogle();
+                                if (vm.errorMessage == null && vm.currentUser != null) {
+                                  if (!mounted) return;
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const HomePage()),
+                                  );
+                                } else {
+                                  if (!mounted) return;
+                                  showDialog(
+                                    context: context,
+                                    builder: (_) => AlertDialog(
+                                      title: const Text("Registration Failed"),
+                                      content: Text(vm.errorMessage ?? "Unknown error"),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () => Navigator.pop(context),
+                                          child: const Text("OK"),
+                                        )
+                                      ],
+                                    ),
+                                  );
+                                }
                               }catch(error){
                                 print("Error : $error");
                                   showDialog(context: context, barrierDismissible: false,builder: (context) => AlertDialog(

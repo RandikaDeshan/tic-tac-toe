@@ -30,7 +30,7 @@ class _GameViewState extends State<GameView> {
   Widget build(BuildContext context) {
     final vm = Provider.of<GameViewModel>(context);
 
-    // play confetti if win
+
     if (vm.winner != null && vm.winner == vm.humanMark) {
       _confettiCtrl.play();
     }
@@ -60,11 +60,11 @@ class _GameViewState extends State<GameView> {
           Column(
             children: [
               const SizedBox(height: 20),
-              _buildScoreboard(vm),
+              _buildScoreboard(vm),   // ✅ Scoreboard on top
               const SizedBox(height: 20),
-              _buildBoard(vm),
+              _buildBoard(vm),        // ✅ Game board
               const SizedBox(height: 20),
-              _buildControls(vm),
+              _buildControls(vm),     // ✅ Controls
             ],
           ),
           Align(
@@ -82,13 +82,14 @@ class _GameViewState extends State<GameView> {
     );
   }
 
+
   Widget _buildScoreboard(GameViewModel vm) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
-        _scoreCard("Wins", vm.scores['wins'] ?? 0, Colors.green),
-        _scoreCard("Losses", vm.scores['losses'] ?? 0, Colors.red),
-        _scoreCard("Draws", vm.scores['draws'] ?? 0, Colors.orange),
+        _scoreCard("Wins", vm.wins, Colors.green),
+        _scoreCard("Losses", vm.losses, Colors.red),
+        _scoreCard("Draws", vm.draws, Colors.orange),
       ],
     );
   }
@@ -96,22 +97,24 @@ class _GameViewState extends State<GameView> {
   Widget _scoreCard(String title, int value, Color color) {
     return Card(
       elevation: 4,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       child: Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           children: [
             Text(title, style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-            Text(value.toString(), style: const TextStyle(fontSize: 18)),
+            const SizedBox(height: 6),
+            Text(value.toString(), style: const TextStyle(fontSize: 20)),
           ],
         ),
       ),
     );
   }
 
+
   Widget _buildBoard(GameViewModel vm) {
     return Expanded(
       child: GridView.builder(
-        shrinkWrap: true,
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 3),
         itemCount: 9,
@@ -121,8 +124,8 @@ class _GameViewState extends State<GameView> {
               vm.checkWinnerAtIndexForMark(i, vm.winner!);
 
           return GestureDetector(
-            onTap: () async {
-              if (!vm.isAiThinking && vm.isAiThinking == false && vm.model.isValidMove(i)) {
+            onTap: () {
+              if (!vm.isAiThinking && vm.model.isValidMove(i)) {
                 vm.playerMove(i);
               }
             },

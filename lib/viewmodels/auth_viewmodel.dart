@@ -11,7 +11,6 @@ class AuthViewModel extends ChangeNotifier {
   String? errorMessage;
 
   AuthViewModel() {
-    // Listen to auth changes
     _authService.userChanges.listen((user) {
       currentUser = user;
       notifyListeners();
@@ -44,6 +43,18 @@ class AuthViewModel extends ChangeNotifier {
     _setLoading(true);
     try {
       currentUser = await _authService.signInWithGoogle();
+      errorMessage = null;
+    } catch (e) {
+      errorMessage = e.toString();
+    }
+    _setLoading(false);
+  }
+
+
+  Future<void> resetPassword(String email) async {
+    _setLoading(true);
+    try {
+      await _authService.sendPasswordResetEmail(email);
       errorMessage = null;
     } catch (e) {
       errorMessage = e.toString();
